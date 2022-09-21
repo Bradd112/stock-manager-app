@@ -29,4 +29,19 @@ class StorageController extends Controller
 
         return response('OK');
     }
+
+    public function update(StorageRequest $request, int $storageId)
+    {
+        $storage = Storage::findOrFail($storageId);
+
+        $storage->fill($request->all());
+
+        if (! $request->has('is_in_abroad')) {
+            $storage->is_in_abroad = false;
+        }
+
+        $storage->save();
+
+        return response('OK');
+    }
 }

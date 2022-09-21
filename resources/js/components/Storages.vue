@@ -22,38 +22,147 @@
                             Még nincs egy raktár sem létrehozva.
                         </p>
 
-                        <div v-else
-                             v-for="storage in storages"
-                        >
-                            <div>
-                                <strong>Megnevezés:</strong>
-                                {{ storage.title }}
-                            </div>
+                        <div v-else>
+                            <Form @submit="updateStorage"
+                                  :validation-schema="schema"
+                                  v-for="storage in storages"
+                            >
+                                <Field name="id"
+                                       type="hidden"
+                                       :value="storage.id"
+                                />
 
-                            <div>
-                                <strong>Cím:</strong>
-                                {{ storage.address }}
-                            </div>
+                                <div>
+                                    <div>
+                                        <strong>Megnevezés: </strong>
 
-                            <div>
-                                <strong>Kapacitás:</strong>
-                                {{ storage.capacity }}
-                            </div>
+                                        <span v-if="! this.editableStorages[storage.id]">
+                                            {{ storage.title }}
+                                        </span>
 
-                            <div>
-                                <strong>Külföldön van?</strong>
-                                {{ storage.is_in_abroad }}
-                            </div>
+                                        <div class="form-group"
+                                             v-if="!! this.editableStorages[storage.id]"
+                                        >
+                                            <Field name="title"
+                                                   class="form-control"
+                                                   type="text"
+                                                   placeholder="Megnevezés"
+                                                   v-model="storage.title"
+                                                   :value="storage.title"
+                                            />
+                                            <ErrorMessage name="title" />
+                                        </div>
+                                    </div>
 
-                            <div class="mt-2">
-                                <button type="button"
-                                        class="btn btn-danger"
-                                        @click="deleteStorage(storage)"
-                                >
-                                    Törlés
-                                </button>
-                            </div>
-                            <hr>
+                                    <div>
+                                        <strong>Cím: </strong>
+
+                                        <span v-if="! this.editableStorages[storage.id]">
+                                            {{ storage.address }}
+                                        </span>
+
+                                        <div class="form-group"
+                                             v-if="!! this.editableStorages[storage.id]"
+                                        >
+                                            <Field name="address"
+                                                   class="form-control"
+                                                   type="text"
+                                                   placeholder="Cím"
+                                                   v-model="storage.address"
+                                                   :value="storage.address"
+                                            />
+                                            <ErrorMessage name="address" />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <strong>Kapacitás: </strong>
+
+                                        <span v-if="! this.editableStorages[storage.id]">
+                                            {{ storage.capacity }}
+                                        </span>
+
+                                        <div class="form-group"
+                                             v-if="!! this.editableStorages[storage.id]"
+                                        >
+                                            <Field name="capacity"
+                                                   class="form-control"
+                                                   type="number"
+                                                   min="0"
+                                                   placeholder="Kapacitás"
+                                                   :value="storage.capacity"
+                                            />
+                                            <ErrorMessage name="capacity" />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label :for="'isInAbroadCheckbox' + storage.id" class="d-inline-block">
+                                            <strong>Külföldön van? </strong>
+                                        </label>
+
+                                        <span v-if="! this.editableStorages[storage.id]">
+                                             {{ storage.is_in_abroad }}
+                                        </span>
+
+                                        <div class="form-group"
+                                             :class="{'d-none': ! this.editableStorages[storage.id]}"
+                                        >
+                                            <Field name="is_in_abroad"
+                                                   type="checkbox"
+                                                   :value="true"
+                                                   :unchecked-value="false"
+                                                   v-slot="{ field }"
+                                            >
+                                                <input type="checkbox"
+                                                       name="is_in_abroad"
+                                                       class="d-block"
+                                                       :id="'isInAbroadCheckbox' + storage.id"
+                                                       v-bind="field"
+                                                       :true-value="true"
+                                                       :false-value="false"
+                                                       :checked="storage.is_in_abroad == 'Igen'"
+                                                >
+                                            </Field>
+                                            <ErrorMessage name="is_in_abroad" />
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex align-items-center mt-2">
+                                        <button type="button"
+                                                class="btn btn-danger mr-10px"
+                                                @click="deleteStorage(storage)"
+                                                v-if="! this.editableStorages[storage.id]"
+                                        >
+                                            Törlés
+                                        </button>
+
+                                        <button type="button"
+                                                class="btn btn-outline-primary mr-10px"
+                                                @click="editStorage(storage)"
+                                                v-if="! this.editableStorages[storage.id]"
+                                        >
+                                            Szerkesztés
+                                        </button>
+
+                                        <button type="button"
+                                                class="btn btn-outline-danger mr-10px"
+                                                @click="editStorage(storage)"
+                                                v-if="!! this.editableStorages[storage.id]"
+                                        >
+                                            Mégse
+                                        </button>
+
+                                        <button type="submit"
+                                                class="btn btn-primary"
+                                                v-if="!! this.editableStorages[storage.id]"
+                                        >
+                                            Mentés
+                                        </button>
+                                    </div>
+                                    <hr>
+                                </div>
+                            </Form>
                         </div>
 
                         <Form @submit="createStorage" :validation-schema="schema" v-if="showNewStorageForm">
@@ -117,6 +226,7 @@
 import axios from 'axios';
 import {ErrorMessage, Field, Form} from 'vee-validate';
 import * as yup from 'yup';
+import * as _ from 'lodash';
 
 export default {
     props: [
@@ -140,12 +250,14 @@ export default {
                     .required('A kapacitás megadása kötelező!')
                     .positive('A kapacitásnak pozitív számnak kell lennie!')
                     .integer('A kapacitásnak számnak kell lennie!'),
-            })
+                is_in_abroad: yup.boolean(),
+            }),
+            editableStorages: [],
         }
     },
 
     mounted() {
-
+        this.keyStoragesById();
     },
 
     methods: {
@@ -160,6 +272,8 @@ export default {
             })
                 .then(function (response) {
                     self.storages = self.storages.concat(response.data.data);
+
+                    self.keyStoragesById();
                 });
         },
 
@@ -175,8 +289,43 @@ export default {
                     self.storages = self.storages.filter(storageToDelete => {
                         return storageToDelete.id != storage.id;
                     })
+
+                    self.keyStoragesById();
                 });
-        }
+        },
+
+        editStorage(storage) {
+            this.editableStorages[storage.id] = ! this.editableStorages[storage.id];
+        },
+
+        updateStorage(values) {
+            let self = this;
+
+            if (document.querySelector('#isInAbroadCheckbox' + values.id + ':checked')) {
+                values.is_in_abroad = true;
+            }
+
+            axios({
+                method: 'put',
+                url: route('storage.update', {storage: values.id}),
+                responseType: 'stream',
+                data: values
+            })
+                .then(function (response) {
+                    self.storages[values.id].title = values.title;
+                    self.storages[values.id].address = values.address;
+                    self.storages[values.id].capacity = values.capacity;
+                    self.storages[values.id].is_in_abroad = values.is_in_abroad ? 'Igen' : 'Nem';
+
+                    self.editableStorages[values.id] = false;
+                });
+        },
+
+        keyStoragesById() {
+            this.storages = _.mapKeys(this.storages, function(value) {
+                return value.id;
+            });
+        },
     }
 }
 </script>
