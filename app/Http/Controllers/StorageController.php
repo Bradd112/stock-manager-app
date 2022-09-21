@@ -22,4 +22,11 @@ class StorageController extends Controller
 
         return new StorageResource($storage);
     }
+
+    public function destroy(int $storageId)
+    {
+        Storage::destroy($storageId);
+
+        return response('OK');
+    }
 }

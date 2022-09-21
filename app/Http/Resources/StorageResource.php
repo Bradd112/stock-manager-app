@@ -9,6 +9,7 @@ class StorageResource extends JsonResource
     public function toArray($request)
     {
         return [
+            'id' => $this->id,
             'title' => $this->title,
             'address' => $this->address,
             'capacity' => $this->capacity,

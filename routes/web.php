@@ -15,4 +15,5 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', [StorageController::class, 'index']);
-Route::post('/storage', [StorageController::class, 'store'])->name('storage.store');
+Route::post('storage', [StorageController::class, 'store'])->name('storage.store');
+Route::delete('storage/{storage}', [StorageController::class, 'destroy'])->name('storage.destroy');

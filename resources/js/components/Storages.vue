@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="card">
@@ -45,6 +45,14 @@
                                 {{ storage.is_in_abroad }}
                             </div>
 
+                            <div class="mt-2">
+                                <button type="button"
+                                        class="btn btn-danger"
+                                        @click="deleteStorage(storage)"
+                                >
+                                    Törlés
+                                </button>
+                            </div>
                             <hr>
                         </div>
 
@@ -112,7 +120,6 @@ import * as yup from 'yup';
 
 export default {
     props: [
-        'newStorageStoreUrl',
         'existingStorages',
     ],
 
@@ -147,7 +154,7 @@ export default {
 
             axios({
                 method: 'post',
-                url: this.newStorageStoreUrl,
+                url: route('storage.store'),
                 responseType: 'stream',
                 data: values
             })
@@ -156,12 +163,19 @@ export default {
                 });
         },
 
-        isRequired(value) {
-            if (value && value.trim()) {
-                return true;
-            }
+        deleteStorage(storage) {
+            let self = this;
 
-            return 'A mező kitöltése kötelező!';
+            axios({
+                method: 'delete',
+                url: route('storage.destroy', {storage: storage.id}),
+                responseType: 'stream',
+            })
+                .then(function () {
+                    self.storages = self.storages.filter(storageToDelete => {
+                        return storageToDelete.id != storage.id;
+                    })
+                });
         }
     }
 }
