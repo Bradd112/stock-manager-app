@@ -10,7 +10,7 @@
                             </div>
 
                             <button class="btn btn-primary"
-                                    @click="showNewStorageForm = true"
+                                    @click="showNewStorageForm = ! showNewStorageForm"
                             >
                                 Új raktár
                             </button>
@@ -18,53 +18,86 @@
                     </div>
 
                     <div class="card-body">
-                        I'm an example component.
+                        <p class="alert alert-danger" v-if="storages.length == 0">
+                            Még nincs egy raktár sem létrehozva.
+                        </p>
 
-                        <form method="post" :action="newStorageStoreUrl" v-if="showNewStorageForm">
+                        <div v-else
+                             v-for="storage in storages"
+                        >
+                            <div>
+                                <strong>Megnevezés:</strong>
+                                {{ storage.title }}
+                            </div>
+
+                            <div>
+                                <strong>Cím:</strong>
+                                {{ storage.address }}
+                            </div>
+
+                            <div>
+                                <strong>Kapacitás:</strong>
+                                {{ storage.capacity }}
+                            </div>
+
+                            <div>
+                                <strong>Külföldön van?</strong>
+                                {{ storage.is_in_abroad }}
+                            </div>
+
+                            <hr>
+                        </div>
+
+                        <Form @submit="createStorage" :validation-schema="schema" v-if="showNewStorageForm">
                             <div class="form-group">
-                                <input class="form-control"
+                                <Field name="title"
+                                       class="form-control"
                                        type="text"
                                        placeholder="Megnevezés"
-                                       v-model="newStorageData.title"
-                                >
+                                />
+                                <ErrorMessage name="title" />
                             </div>
 
                             <div class="form-group mt-2">
-                                <input class="form-control"
+                                <Field name="address"
+                                       class="form-control"
                                        type="text"
                                        placeholder="Cím"
-                                       v-model="newStorageData.address"
-                                >
+                                />
+                                <ErrorMessage name="address" />
                             </div>
 
                             <div class="form-group mt-2">
-                                <input class="form-control"
+                                <Field name="capacity"
+                                       class="form-control"
                                        type="number"
-                                       placeholder="Kapacitás"
                                        min="0"
-                                       v-model="newStorageData.capacity"
-                                >
+                                       placeholder="Kapacitás"
+                                />
+                                <ErrorMessage name="capacity" />
                             </div>
 
                             <div class="form-group mt-2">
                                 <label for="isInAbroadCheckbox">Külföldön van?</label>
 
-                                <input type="checkbox"
-                                       id="isInAbroadCheckbox"
+                                <Field name="is_in_abroad"
                                        class="d-block"
-                                       v-model="newStorageData.is_in_abroad"
-                                >
+                                       type="checkbox"
+                                       id="isInAbroadCheckbox"
+                                       :value="true"
+                                       :unchecked-value="undefined"
+                                />
+                                <ErrorMessage name="is_in_abroad" />
                             </div>
 
                             <div class="form-group mt-2">
-                                <button type="button"
+                                <button type="submit"
                                         class="btn btn-primary"
-                                        @click="createStorage"
                                 >
                                     Létrehozás
                                 </button>
                             </div>
-                        </form>
+                        </Form>
                     </div>
                 </div>
             </div>
@@ -74,21 +107,33 @@
 
 <script>
 import axios from 'axios';
+import {ErrorMessage, Field, Form} from 'vee-validate';
+import * as yup from 'yup';
 
 export default {
     props: [
         'newStorageStoreUrl',
+        'existingStorages',
     ],
+
+    components: {
+        Field,
+        Form,
+        ErrorMessage,
+    },
 
     data: function () {
         return {
+            storages: this.existingStorages,
             showNewStorageForm: false,
-            newStorageData: {
-                title: '',
-                address: '',
-                capacity: null,
-                is_in_abroad: false,
-            },
+            schema: yup.object({
+                title: yup.string().required('A megnevezés megadása kötelező!'),
+                address: yup.string().required('A cím megadása kötelező!'),
+                capacity: yup.number()
+                    .required('A kapacitás megadása kötelező!')
+                    .positive('A kapacitásnak pozitív számnak kell lennie!')
+                    .integer('A kapacitásnak számnak kell lennie!'),
+            })
         }
     },
 
@@ -97,16 +142,27 @@ export default {
     },
 
     methods: {
-        createStorage() {
+        createStorage(values) {
+            let self = this;
+
             axios({
                 method: 'post',
                 url: this.newStorageStoreUrl,
-                responseType: 'stream'
+                responseType: 'stream',
+                data: values
             })
                 .then(function (response) {
-                    console.log(response);
+                    self.storages = self.storages.concat(response.data.data);
                 });
         },
+
+        isRequired(value) {
+            if (value && value.trim()) {
+                return true;
+            }
+
+            return 'A mező kitöltése kötelező!';
+        }
     }
 }
 </script>

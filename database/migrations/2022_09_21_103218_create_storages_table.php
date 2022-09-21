@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('address');
             $table->integer('capacity');
-            $table->boolean('is_in_abroad');
+            $table->boolean('is_in_abroad')->default(false);
 
             $table->timestamps();
         });
