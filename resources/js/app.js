@@ -11,7 +11,6 @@ import './bootstrap';
  * registering components with the application instance so they are ready
  * to use in your application's views. An example is included for you.
  */
-
 import './components/components';
 
 /**
@@ -19,7 +18,7 @@ import './components/components';
  * Vue components. It will recursively scan this directory for the Vue
  * components and automatically register them with their "basename".
  *
- * Eg. ./components/ExampleComponent.vue -> <example-component></example-component>
+ * Eg. ./components/Storages.vue -> <example-component></example-component>
  */
 
 // Object.entries(import.meta.glob('./**/*.vue', { eager: true })).forEach(([path, definition]) => {

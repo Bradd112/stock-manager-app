@@ -1,8 +1,8 @@
-import { createApp } from 'vue';
+import {createApp} from 'vue';
+import Storages from './Storages.vue';
 
 const app = createApp({});
 
-import ExampleComponent from './ExampleComponent.vue';
-app.component('example-component', ExampleComponent);
+app.component('storages', Storages);
 
 app.mount('#app');
