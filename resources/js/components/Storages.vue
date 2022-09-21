@@ -18,7 +18,7 @@
                     </div>
 
                     <div class="card-body">
-                        <p class="alert alert-danger" v-if="storages.length == 0">
+                        <p class="alert alert-danger" v-if="Object.values(storages).length == 0">
                             Még nincs egy raktár sem létrehozva.
                         </p>
 
@@ -29,7 +29,7 @@
                             >
                                 <Field name="id"
                                        type="hidden"
-                                       :value="storage.id"
+                                       v-model="storage.id"
                                 />
 
                                 <div>
@@ -271,7 +271,7 @@ export default {
                 data: values
             })
                 .then(function (response) {
-                    self.storages = self.storages.concat(response.data.data);
+                    self.storages = Object.values(self.storages).concat(response.data.data);
 
                     self.keyStoragesById();
                 });
@@ -286,7 +286,7 @@ export default {
                 responseType: 'stream',
             })
                 .then(function () {
-                    self.storages = self.storages.filter(storageToDelete => {
+                    self.storages = Object.values(self.storages).filter(storageToDelete => {
                         return storageToDelete.id != storage.id;
                     })
 
