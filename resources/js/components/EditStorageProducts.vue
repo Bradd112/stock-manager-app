@@ -26,6 +26,7 @@
                             <Form @submit="updateProduct"
                                   :validation-schema="schema"
                                   v-for="product in products"
+                                  :ref="'productForm' + product.id"
                             >
                                 <Field name="id"
                                        type="hidden"
@@ -123,7 +124,9 @@
                                     </div>
 
                                     <div>
-                                        <strong>Márka: </strong>
+                                        <label :for="'brandSelect' + product.id">
+                                            <strong>Márka:</strong>
+                                        </label>
 
                                         <span v-if="! this.editableProducts[product.id] && product.brand">
                                             {{ product.brand.title }}
@@ -141,16 +144,17 @@
                                                    class="form-control"
                                                    id="brandSelect"
                                             >
-                                                <option value="">Válassz egyet</option>
+                                                <option value="" disabled>Válassz egyet</option>
 
                                                 <option v-for="brand in brands"
                                                         :value="brand.id"
                                                         :selected="product.brand && product.brand.id == brand.id"
+                                                        selected
                                                 >
                                                     {{ brand.title }}
                                                 </option>
                                             </Field>
-                                            <ErrorMessage name="tax_percentage" />
+                                            <ErrorMessage name="brand_id" />
                                         </div>
                                     </div>
 
@@ -242,14 +246,14 @@
                                        class="form-control"
                                        id="brandSelect"
                                 >
-                                    <option value="">Válassz egyet</option>
+                                    <option value="" disabled>Válassz egyet</option>
                                     <option v-for="brand in brands"
                                             :value="brand.id"
                                     >
                                         {{ brand.title }}
                                     </option>
                                 </Field>
-                                <ErrorMessage name="tax_percentage" />
+                                <ErrorMessage name="brand_id" />
                             </div>
 
                             <div class="form-group mt-2">
@@ -298,9 +302,9 @@ export default {
                     .positive('A cikkszámnak pozitív számnak kell lennie!')
                     .integer('A cikkszámnak számnak kell lennie!'),
                 tax_percentage: yup.number()
-                    .required('A cikkszám megadása kötelező!')
-                    .positive('A cikkszámnak pozitív számnak kell lennie!')
-                    .integer('A cikkszámnak számnak kell lennie!'),
+                    .required('Az ÁFA% megadása kötelező!')
+                    .positive('A ÁFA%-nak pozitív számnak kell lennie!')
+                    .integer('A ÁFA%-nak számnak kell lennie!'),
                 brand_id: yup.number(),
                 storage_id: yup.number(),
             }),
@@ -310,6 +314,11 @@ export default {
 
     mounted() {
         this.keyProductsById();
+
+        let self = this;
+        Object.values(this.products).forEach(function (product) {
+            self.setBrandIdValueInFormCorrectly(product);
+        });
     },
 
     methods: {
@@ -348,6 +357,7 @@ export default {
 
         editProduct(product) {
             this.editableProducts[product.id] = ! this.editableProducts[product.id];
+            this.setBrandIdValueInFormCorrectly(product);
         },
 
         updateProduct(values) {
@@ -375,6 +385,16 @@ export default {
                 return value.id;
             });
         },
+
+        setBrandIdValueInFormCorrectly(product) {
+            if (! product.brand) {
+                return;
+            }
+
+            let productFormRef = 'productForm' + product.id;
+
+            this.$refs[productFormRef][0].setFieldValue('brand_id', product.brand.id);
+        }
     }
 }
 </script>
