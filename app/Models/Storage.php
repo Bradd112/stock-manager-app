@@ -19,8 +19,13 @@ class Storage extends Model
         return $this->hasMany(Product::class);
     }
 
-    public function getProductsCounted()
+    public function getProductsCounted(): int
     {
         return $this->products->count();
+    }
+
+    public function hasMoreCapacity(): bool
+    {
+        return $this->getProductsCounted() < $this->capacity;
     }
 }

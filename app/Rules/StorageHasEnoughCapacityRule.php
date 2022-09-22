@@ -11,7 +11,7 @@ class StorageHasEnoughCapacityRule implements Rule
     {
         $storage = Storage::with('products')->where('id', $value)->first();
 
-        return $storage->getProductsCounted() < $storage->capacity;
+        return $storage->hasMoreCapacity();
     }
 
     public function message()

@@ -11,7 +11,7 @@
 
                             <button class="btn btn-primary"
                                     @click="showNewProductForm = ! showNewProductForm"
-                                    v-if="storage.products_counted < storage.capacity"
+                                    v-if="storage.has_more_capacity"
                             >
                                 Új termék
                             </button>
@@ -23,7 +23,11 @@
                             Még nincs egy termék sem létrehozva.
                         </p>
 
-                        <div v-else>
+                        <p class="alert alert-info" v-if="! storage.has_more_capacity">
+                            A raktár kapacitása megtelt, nem fér el több termék benne.
+                        </p>
+
+                        <div v-if="Object.values(products).length > 0">
                             <Form @submit="updateProduct"
                                   :validation-schema="schema"
                                   v-for="product in products"
