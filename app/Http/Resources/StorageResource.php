@@ -13,6 +13,7 @@ class StorageResource extends JsonResource
             'title' => $this->title,
             'address' => $this->address,
             'capacity' => $this->capacity,
+            'products_counted' => $this->getProductsCounted(),
             'is_in_abroad' => $this->is_in_abroad ? 'Igen' : 'Nem',
             'edit_products_link' => route('product.edit-storage-products', ['storage' => $this->id]),
         ];

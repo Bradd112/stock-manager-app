@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\StorageHasEnoughCapacityRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ProductRequest extends FormRequest
@@ -19,7 +20,7 @@ class ProductRequest extends FormRequest
             'price' => ['required', 'numeric', 'min:1'],
             'tax_percentage' => ['required', 'numeric', 'min:1'],
             'brand_id' => ['nullable', 'exists:brands,id'],
-            'storage_id' => ['nullable', 'exists:storages,id'],
+            'storage_id' => ['nullable', 'exists:storages,id', new StorageHasEnoughCapacityRule()],
         ];
     }
 }

@@ -11,6 +11,7 @@
 
                             <button class="btn btn-primary"
                                     @click="showNewProductForm = ! showNewProductForm"
+                                    v-if="storage.products_counted < storage.capacity"
                             >
                                 Új termék
                             </button>
