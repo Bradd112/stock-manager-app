@@ -6,7 +6,7 @@ use App\Http\Requests\BrandRequest;
 use App\Http\Resources\BrandResource;
 use App\Models\Brand;
 
-class BrandController extends Controller
+class BrandsController extends Controller
 {
     public function store(BrandRequest $request)
     {
@@ -28,6 +28,6 @@ class BrandController extends Controller
         $brand->fill($request->all());
         $brand->save();
 
-        return response('OK');
+        return new BrandResource($brand);
     }
 }

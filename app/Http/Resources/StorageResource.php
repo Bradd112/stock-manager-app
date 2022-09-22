@@ -14,6 +14,7 @@ class StorageResource extends JsonResource
             'address' => $this->address,
             'capacity' => $this->capacity,
             'is_in_abroad' => $this->is_in_abroad ? 'Igen' : 'Nem',
+            'edit_products_link' => route('product.edit-storage-products', ['storage' => $this->id]),
         ];
     }
 }

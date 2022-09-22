@@ -159,6 +159,13 @@
                                         >
                                             Mentés
                                         </button>
+
+                                        <a :href="storage.edit_products_link"
+                                            class="btn btn-outline-secondary"
+                                            v-if="! this.editableStorages[storage.id]"
+                                        >
+                                            Termékek szerkesztése
+                                        </a>
                                     </div>
                                     <hr>
                                 </div>
@@ -312,10 +319,7 @@ export default {
                 data: values
             })
                 .then(function (response) {
-                    self.storages[values.id].title = values.title;
-                    self.storages[values.id].address = values.address;
-                    self.storages[values.id].capacity = values.capacity;
-                    self.storages[values.id].is_in_abroad = values.is_in_abroad ? 'Igen' : 'Nem';
+                    self.storages[values.id] = response.data.data;
 
                     self.editableStorages[values.id] = false;
                 });

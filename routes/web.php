@@ -1,8 +1,9 @@
 <?php
 
-use App\Http\Controllers\BrandController;
+use App\Http\Controllers\BrandsController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\StorageController;
+use App\Http\Controllers\ProductsController;
+use App\Http\Controllers\StoragesController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,11 +20,17 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index']);
 
 // Storages
-Route::post('storage', [StorageController::class, 'store'])->name('storage.store');
-Route::put('storage/{storage}', [StorageController::class, 'update'])->name('storage.update');
-Route::delete('storage/{storage}', [StorageController::class, 'destroy'])->name('storage.destroy');
+Route::post('storage', [StoragesController::class, 'store'])->name('storage.store');
+Route::put('storage/{storage}', [StoragesController::class, 'update'])->name('storage.update');
+Route::delete('storage/{storage}', [StoragesController::class, 'destroy'])->name('storage.destroy');
 
 // Brands
-Route::post('brand', [BrandController::class, 'store'])->name('brand.store');
-Route::put('brand/{brand}', [BrandController::class, 'update'])->name('brand.update');
-Route::delete('brand/{brand}', [BrandController::class, 'destroy'])->name('brand.destroy');
+Route::post('brand', [BrandsController::class, 'store'])->name('brand.store');
+Route::put('brand/{brand}', [BrandsController::class, 'update'])->name('brand.update');
+Route::delete('brand/{brand}', [BrandsController::class, 'destroy'])->name('brand.destroy');
+
+// Products
+Route::get('storage/{storage}/edit-products', [ProductsController::class, 'editStorageProducts'])->name('product.edit-storage-products');
+Route::post('product', [ProductsController::class, 'store'])->name('product.store');
+Route::put('product/{product}', [ProductsController::class, 'update'])->name('product.update');
+Route::delete('product/{product}', [ProductsController::class, 'destroy'])->name('product.destroy');

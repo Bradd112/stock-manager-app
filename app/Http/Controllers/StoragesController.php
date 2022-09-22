@@ -6,7 +6,7 @@ use App\Http\Requests\StorageRequest;
 use App\Http\Resources\StorageResource;
 use App\Models\Storage;
 
-class StorageController extends Controller
+class StoragesController extends Controller
 {
     public function store(StorageRequest $request)
     {
@@ -34,6 +34,6 @@ class StorageController extends Controller
 
         $storage->save();
 
-        return response('OK');
+        return new StorageResource($storage);
     }
 }

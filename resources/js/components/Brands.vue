@@ -270,9 +270,7 @@ export default {
                 data: values
             })
                 .then(function (response) {
-                    self.brands[values.id].title = values.title;
-                    self.brands[values.id].quality_level = values.quality_level;
-                    self.brands[values.id].website_url = values.website_url;
+                    self.brands[values.id] = response.data.data;
 
                     self.editableBrands[values.id] = false;
                 });
