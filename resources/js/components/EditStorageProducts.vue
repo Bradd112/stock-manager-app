@@ -6,12 +6,12 @@
                     <div class="card-header">
                         <div class="d-flex align-items-center justify-content-between">
                             <div>
-                                "{{ storage.title }}" raktár termékei
+                                "{{ mainStorage.title }}" raktár termékei
                             </div>
 
                             <button class="btn btn-primary"
                                     @click="showNewProductForm = ! showNewProductForm"
-                                    v-if="storage.has_more_capacity"
+                                    v-if="mainStorage.has_more_capacity"
                             >
                                 Új termék
                             </button>
@@ -23,7 +23,7 @@
                             Még nincs egy termék sem létrehozva.
                         </p>
 
-                        <p class="alert alert-info" v-if="! storage.has_more_capacity">
+                        <p class="alert alert-info" v-if="! mainStorage.has_more_capacity">
                             A raktár kapacitása megtelt, nem fér el több termék benne.
                         </p>
 
@@ -200,7 +200,7 @@
                             </Form>
                         </div>
 
-                        <Form @submit="createProduct" :validation-schema="schema" v-if="showNewProductForm">
+                        <Form @submit="createProduct" :validation-schema="schema" v-if="showNewProductForm && mainStorage.has_more_capacity">
                             <Field name="storage_id"
                                    type="hidden"
                                    v-model="storage.id"
@@ -297,6 +297,7 @@ export default {
 
     data: function () {
         return {
+            mainStorage: this.storage,
             products: this.existingProducts,
             showNewProductForm: false,
             schema: yup.object({
@@ -340,6 +341,9 @@ export default {
                     self.products = Object.values(self.products).concat(response.data.data);
 
                     self.keyProductsById();
+
+                    self.mainStorage.products_counted++;
+                    self.mainStorage.has_more_capacity = self.mainStorage.capacity > self.mainStorage.products_counted;
                 });
         },
 
@@ -357,6 +361,9 @@ export default {
                     })
 
                     self.keyProductsById();
+
+                    self.mainStorage.products_counted--;
+                    self.mainStorage.has_more_capacity = self.mainStorage.capacity > self.mainStorage.products_counted;
                 });
         },
 
@@ -400,6 +407,6 @@ export default {
 
             this.$refs[productFormRef][0].setFieldValue('brand_id', product.brand.id);
         }
-    }
+    },
 }
 </script>
